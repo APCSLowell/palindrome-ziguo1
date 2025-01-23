@@ -1,0 +1,29 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Palindrome Test
+      id: palindrome-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Palindrome Test
+        setup-command: ''
+        command: gradle test
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        PALINDROME-TEST_RESULTS: "${{steps.palindrome-test.outputs.result}}"
+      with:
+        runners: palindrome-test
